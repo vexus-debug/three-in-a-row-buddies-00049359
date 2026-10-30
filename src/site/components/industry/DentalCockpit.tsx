@@ -4,9 +4,9 @@ import { Boxes, FileText, Receipt, Wallet } from "lucide-react";
 type Condition = "composite" | "crown" | "endo" | "extraction";
 
 const CONDITIONS: Record<Condition, { label: string; swatch: string; soap: string; code: string; fee: string; stock: string; commission: string }> = {
-  composite: { label: "Composite resin (MOD)", swatch: "fill-primary stroke-primary-text", soap: "Caries on mesial, occlusal and distal surfaces. Restored with A2 composite.", code: "Composite filling, 3 surfaces", fee: "₦45,000", stock: "−1 composite syringe A2, −1 bonding unit", commission: "₦13,500 to treating dentist" },
+  composite: { label: "Composite resin (MOD)", swatch: "fill-primary stroke-[hsl(var(--primary-text))]", soap: "Caries on mesial, occlusal and distal surfaces. Restored with A2 composite.", code: "Composite filling, 3 surfaces", fee: "₦45,000", stock: "−1 composite syringe A2, −1 bonding unit", commission: "₦13,500 to treating dentist" },
   crown: { label: "Porcelain crown", swatch: "fill-foreground stroke-foreground", soap: "Fractured incisal edge. Prepared for full-coverage porcelain crown, shade A1.", code: "Porcelain crown", fee: "₦180,000", stock: "−1 impression putty, lab slip sent", commission: "₦54,000 to treating dentist" },
-  endo: { label: "Root canal treatment", swatch: "fill-status-warning stroke-status-warning", soap: "Irreversible pulpitis. Canals shaped, irrigated and obturated.", code: "Root canal, molar", fee: "₦120,000", stock: "−3 files, −1 gutta-percha pack, −2 anaesthetic cartridges", commission: "₦36,000 to treating dentist" },
+  endo: { label: "Root canal treatment", swatch: "fill-[hsl(var(--status-warning))] stroke-[hsl(var(--status-warning))]", soap: "Irreversible pulpitis. Canals shaped, irrigated and obturated.", code: "Root canal, molar", fee: "₦120,000", stock: "−3 files, −1 gutta-percha pack, −2 anaesthetic cartridges", commission: "₦36,000 to treating dentist" },
   extraction: { label: "Surgical extraction", swatch: "fill-muted-foreground/40 stroke-muted-foreground", soap: "Impacted third molar. Surgical extraction scheduled, consent signed.", code: "Surgical extraction", fee: "₦75,000", stock: "−2 anaesthetic cartridges, −1 suture pack", commission: "₦22,500 to treating dentist" },
 };
 
@@ -54,7 +54,7 @@ export const DentalCockpit = () => {
             ))}
           </div>
           <div className="rounded-xl bg-background p-2 sm:p-4">
-            <div className="grid grid-cols-16 gap-0.5" style={{ gridTemplateColumns: "repeat(16, minmax(0, 1fr))" }}>
+            <div className="grid gap-0.5" style={{ gridTemplateColumns: "repeat(16, minmax(0, 1fr))" }}>
               {upper.map((n) => <Tooth key={n} n={n} active={tooth === n} cond={preset[n]} onClick={() => setTooth(n)} />)}
             </div>
             <div className="my-2 border-t border-dashed border-border" />
