@@ -3,11 +3,37 @@
 
 export type CompensationBasis = "production" | "collections";
 
+/** One bracket of a graduated commission. `up_to` null = no ceiling (top bracket). */
+export interface CommissionTier {
+  up_to: number | null;
+  rate: number; // %
+}
+
 export interface AssociateContract {
   compensation_basis: CompensationBasis;
-  commission_rate: number; // % of net fee
+  commission_rate: number; // % of net fee (used when no tiers are set)
   lab_fee_share: number; // % of lab fees the dentist carries
   daily_minimum: number; // guaranteed earnings per working day
+  /** Optional graduated brackets applied marginally to cumulative net production. */
+  commission_tiers?: CommissionTier[] | null;
+}
+
+/**
+ * Commission on `net` net production using marginal brackets
+ * (e.g. 30% up to 10k, 35% 10k–20k, 40% above). Falls back to a flat rate.
+ */
+export function tieredCommission(net: number, tiers: CommissionTier[] | null | undefined, flatRate: number): number {
+  const amount = Math.max(0, Number(net) || 0);
+  if (!tiers || !tiers.length) return (amount * flatRate) / 100;
+  const sorted = [...tiers].sort((a, b) => (a.up_to ?? Infinity) - (b.up_to ?? Infinity));
+  let total = 0, floor = 0;
+  for (const t of sorted) {
+    const ceil = t.up_to ?? Infinity;
+    if (amount <= floor) break;
+    total += ((Math.min(amount, ceil) - floor) * t.rate) / 100;
+    floor = ceil;
+  }
+  return total;
 }
 
 export interface ProducedLine {

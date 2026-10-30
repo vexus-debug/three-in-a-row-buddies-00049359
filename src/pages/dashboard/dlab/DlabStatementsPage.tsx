@@ -14,7 +14,7 @@ type Period = "all" | "this" | "last" | "custom";
 const ymd = (d: Date) => format(d, "yyyy-MM-dd");
 
 export default function DlabStatementsPage() {
-  const { data, cases, invoices, payments, credits, isLoading } = useClientSummaries();
+  const { data, cases, invoices: allInvoices, payments, credits, isLoading } = useClientSummaries();
   const [client, setClient] = useState<string>("");
   const [period, setPeriod] = useState<Period>("all");
   const [from, setFrom] = useState("");
@@ -30,6 +30,7 @@ export default function DlabStatementsPage() {
   }, [period, from, to]);
 
   const { lines, opening } = useMemo(() => {
+    const invoices = allInvoices ?? [];
     const billedCases = cases.filter((c) => sameClient(clientOf(c), current)).flatMap((c) => {
       const inv = invoices.find((i) => i.lab_case_id === c.id);
       if (!inv && normalizeStage(c.status) !== "delivered") return []; // unfinished work is not billed yet
@@ -49,7 +50,7 @@ export default function DlabStatementsPage() {
     const lines = all.filter((r) => (!range.from || r.date >= range.from) && (!range.to || r.date <= range.to))
       .map((r) => ({ ...r, balance: (bal += r.debit - r.credit) }));
     return { lines, opening };
-  }, [cases, invoices, payments, credits, current, range]);
+  }, [cases, allInvoices, payments, credits, current, range]);
   const balance = lines.at(-1)?.balance ?? opening;
 
   return (
