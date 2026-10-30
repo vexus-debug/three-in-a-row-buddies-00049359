@@ -13,6 +13,16 @@ export interface UpdateEntry {
 
 export const updates: UpdateEntry[] = [
   {
+    version: "v2.21.2",
+    date: "October 30, 2026",
+    title: "Sharper, more readable website typography",
+    kind: "improvement",
+    items: [
+      { kind: "improvement", text: "The public website now uses a new clinical type pairing for headlines and body text." },
+      { kind: "improvement", text: "Large headlines breathe better on phones, and small labels and captions are easier to read." },
+    ],
+  },
+  {
     version: "v2.21.1",
     date: "October 30, 2026",
     title: "Tiered commission engine and older statement clarity",

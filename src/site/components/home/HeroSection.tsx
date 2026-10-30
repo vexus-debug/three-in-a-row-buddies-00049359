@@ -130,7 +130,7 @@ const HeroSection = () => {
             </div>
           </motion.div>
 
-          <figcaption className="mt-3 text-xs text-white/35">
+          <figcaption className="mt-3 text-xs text-muted-foreground">
             The Clinexus dashboard: today's schedule, outstanding invoices and clinic revenue on one screen.
           </figcaption>
         </motion.figure>
