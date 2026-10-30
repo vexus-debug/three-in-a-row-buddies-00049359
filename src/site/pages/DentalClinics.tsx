@@ -30,7 +30,6 @@ import shotTreatments from "@/assets/dashboard-shots/dental-treatments.png";
 import { LocalSeo } from "@/site/components/LocalSeo";
 import { CapabilityMatrix, ClosingBanner, PricingEstimator, type CapabilityGroup } from "@/site/components/industry/IndustrySections";
 import { DentalSavings, DentalTrust } from "@/site/components/industry/DentalSavings";
-import { DentalCockpit } from "@/site/components/industry/DentalCockpit";
 
 const matrixGroups: CapabilityGroup[] = [
   { tab: "Clinical", icon: Smile, tag: "Clinical & Charting", title: "Chart by tooth, plan by patient", benefit: "Everything you record in the chair stays attached to the same patient.", points: ["Tooth-by-tooth charting", "Treatment plans", "SOAP notes", "Prescriptions", "Digital consent forms", "Tooth-tagged imaging"] },
@@ -165,7 +164,35 @@ const DentalClinics = () => {
         <div className="mx-auto max-w-6xl px-4 pb-12 pt-16 sm:px-6 sm:pb-16 lg:pb-24">
 
 
-          <DentalCockpit />
+          <section id="features" className="scroll-mt-24">
+            <motion.h2 initial="hidden" whileInView="show" viewport={viewport} variants={reveal} className="mb-4 text-2xl font-bold text-foreground md:text-3xl">
+              What you get, <span className="text-muted-foreground">in plain words</span>
+            </motion.h2>
+            <motion.p initial="hidden" whileInView="show" viewport={viewport} variants={reveal} className="mb-10 max-w-2xl text-muted-foreground">
+              One simple place for your patients, your appointments, your money and your stock — instead of the folders, notebooks and endless chats that eat your evenings.
+            </motion.p>
+            <div className="mb-16 grid grid-cols-1 gap-4 md:grid-cols-6 lg:mb-24">
+              {modules.map((item, i) => {
+                const span = ["md:col-span-4", "md:col-span-2", "md:col-span-2", "md:col-span-4", "md:col-span-3", "md:col-span-3"][i];
+                const wide = i === 0 || i === 3;
+                return (
+                  <motion.article key={item.name} initial="hidden" whileInView="show" viewport={viewport} variants={reveal} className={`eye-panel group min-w-0 overflow-hidden rounded-2xl sm:rounded-3xl ${span} ${wide ? "lg:grid lg:grid-cols-[1fr_1.2fr] lg:items-center lg:gap-6" : "flex flex-col"} p-5 sm:p-6`}>
+                    <div className={wide ? "lg:order-2" : ""}>
+                      <Screenshot src={item.shot} alt={item.shotAlt} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="mb-3 flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10"><item.icon className="h-5 w-5 text-primary" /></div>
+                        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{String(i + 1).padStart(2, "0")} · {item.name}</span>
+                      </div>
+                      <h3 className="mb-2 text-lg font-bold leading-snug text-card-foreground sm:text-xl">{item.benefit}</h3>
+                      <p className="text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+                    </div>
+                  </motion.article>
+                );
+              })}
+            </div>
+          </section>
 
           <DentalSavings />
 
@@ -174,21 +201,21 @@ const DentalClinics = () => {
             <motion.h2 initial="hidden" whileInView="show" viewport={viewport} variants={reveal} className="mb-8 text-2xl font-bold text-foreground md:text-3xl">
               From the front door to the payment, <span className="text-muted-foreground">one record the whole way</span>
             </motion.h2>
-            <ol className="relative grid gap-6 md:grid-cols-5 md:gap-4">
-              <span aria-hidden="true" className="absolute bottom-4 left-4 top-4 w-px bg-primary/40 md:bottom-auto md:left-4 md:right-4 md:top-4 md:h-px md:w-auto" />
+            <ol className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-5 md:overflow-visible md:px-0">
               {[
-                { icon: Users, t: "Reception", d: "Checked in, allergies and HMO flagged up front." },
-                { icon: Smile, t: "Charting", d: "Tooth chart, notes and signed consent together." },
-                { icon: Boxes, t: "Materials", d: "Cartridges and composite come off stock automatically." },
-                { icon: ClipboardList, t: "Lab slip", d: "Shade and prescription sent straight to the lab." },
-                { icon: Wallet, t: "Checkout", d: "Invoice, HMO claim or payment plan on the same file." },
+                { icon: CalendarClock, t: "Booked", d: "Chair and dentist reserved, reminder sent." },
+                { icon: Users, t: "Checked in", d: "Front desk sees them join the queue." },
+                { icon: Smile, t: "In the chair", d: "Tooth chart, notes and X-rays open together." },
+                { icon: Boxes, t: "Materials used", d: "Stock updates from the treatment itself." },
+                { icon: Wallet, t: "Paid", d: "Invoice or payment plan, on the same file." },
               ].map((s, i) => (
-                <motion.li key={s.t} initial="hidden" whileInView="show" viewport={viewport} variants={reveal} className="relative flex gap-4 md:flex-col md:gap-3">
-                  <span className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground ring-4 ring-background">{i + 1}</span>
-                  <div className="min-w-0">
-                    <h3 className="mb-1 flex items-center gap-2 text-base font-semibold text-foreground"><s.icon className="h-4 w-4 text-primary" />{s.t}</h3>
-                    <p className="text-sm leading-snug text-muted-foreground">{s.d}</p>
-                  </div>
+                <motion.li key={s.t} initial="hidden" whileInView="show" viewport={viewport} variants={reveal} className="eye-panel relative w-[72%] shrink-0 snap-start rounded-2xl p-5 sm:w-[45%] md:w-auto">
+                  <span className="mb-4 flex items-center gap-2">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{i + 1}</span>
+                    <s.icon className="h-4 w-4 text-primary" />
+                  </span>
+                  <h3 className="mb-1 text-base font-semibold text-card-foreground">{s.t}</h3>
+                  <p className="text-sm leading-snug text-muted-foreground">{s.d}</p>
                 </motion.li>
               ))}
             </ol>
