@@ -37,3 +37,18 @@ describe("associate pay", () => {
     expect(s.totalPayable).toBe(21000);
   });
 });
+
+describe("tiered commission (30% to 10k, 35% 10k–20k, 40% above, on net)", async () => {
+  const { tieredCommission, calculatePayStatement } = await import("@/lib/associatePay");
+  const tiers = [{ up_to: 10000, rate: 30 }, { up_to: 20000, rate: 35 }, { up_to: null, rate: 40 }];
+  it("10,000 net earns 3,000", () => expect(tieredCommission(10000, tiers, 0)).toBe(3000));
+  it("20,000 net earns 6,500", () => expect(tieredCommission(20000, tiers, 0)).toBe(6500));
+  it("25,000 net earns 8,500", () => expect(tieredCommission(25000, tiers, 0)).toBe(8500));
+  it("no tiers uses the flat rate", () => expect(tieredCommission(1000, [], 35)).toBe(350));
+  it("statement crosses brackets across lines", () => {
+    const line = (id: string, total: number) => ({ id, invoice_id: id, invoice_date: "2026-10-01", patient_id: null, description: id, line_total: total, invoice_subtotal: total, invoice_discount: 0, invoice_total: total, invoice_paid: total });
+    const s = calculatePayStatement({ compensation_basis: "production", commission_rate: 0, lab_fee_share: 0, daily_minimum: 0, commission_tiers: tiers }, [line("a", 15000), line("b", 10000)], []);
+    expect(s.commissionEarned).toBe(8500);
+    expect(s.lines[0].earned_amount).toBe(4750);
+  });
+});

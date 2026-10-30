@@ -3,11 +3,37 @@
 
 export type CompensationBasis = "production" | "collections";
 
+/** One bracket of a graduated commission. `up_to` null = no ceiling (top bracket). */
+export interface CommissionTier {
+  up_to: number | null;
+  rate: number; // %
+}
+
 export interface AssociateContract {
   compensation_basis: CompensationBasis;
-  commission_rate: number; // % of net fee
+  commission_rate: number; // % of net fee (used when no tiers are set)
   lab_fee_share: number; // % of lab fees the dentist carries
   daily_minimum: number; // guaranteed earnings per working day
+  /** Optional graduated brackets applied marginally to cumulative net production. */
+  commission_tiers?: CommissionTier[] | null;
+}
+
+/**
+ * Commission on `net` net production using marginal brackets
+ * (e.g. 30% up to 10k, 35% 10k–20k, 40% above). Falls back to a flat rate.
+ */
+export function tieredCommission(net: number, tiers: CommissionTier[] | null | undefined, flatRate: number): number {
+  const amount = Math.max(0, Number(net) || 0);
+  if (!tiers || !tiers.length) return (amount * flatRate) / 100;
+  const sorted = [...tiers].sort((a, b) => (a.up_to ?? Infinity) - (b.up_to ?? Infinity));
+  let total = 0, floor = 0;
+  for (const t of sorted) {
+    const ceil = t.up_to ?? Infinity;
+    if (amount <= floor) break;
+    total += ((Math.min(amount, ceil) - floor) * t.rate) / 100;
+    floor = ceil;
+  }
+  return total;
 }
 
 export interface ProducedLine {
@@ -66,6 +92,8 @@ export function calculatePayStatement(
   labs: LabCharge[],
 ): PayStatement {
   const rate = contract.commission_rate;
+  const tiers = contract.commission_tiers?.length ? contract.commission_tiers : null;
+  let cumNet = 0;
   const lines: PayLine[] = [];
   let gross = 0, net = 0, earned = 0, labDed = 0;
   const days = new Set<string>();
@@ -80,13 +108,18 @@ export function calculatePayStatement(
       n = n * ratio;
     }
     n = r2(n);
-    const e = r2((n * rate) / 100);
+    // Tiers are marginal on running net production (after discounts, before lab fees).
+    const e = tiers
+      ? r2(tieredCommission(cumNet + n, tiers, rate) - tieredCommission(cumNet, tiers, rate))
+      : r2((n * rate) / 100);
+    cumNet += n;
+    const lineRate = tiers ? (n > 0 ? r2((e / n) * 100) : 0) : rate;
     gross += g; net += n; earned += e;
     days.add(l.invoice_date);
     lines.push({
       item_type: "procedure", source_id: l.id, patient_id: l.patient_id, item_date: l.invoice_date,
       description: att < 100 ? `${l.description} (${att}% split)` : l.description, attribution: att, gross_amount: r2(g), deduction_amount: r2(g - n), net_amount: n,
-      commission_rate: rate, earned_amount: e,
+      commission_rate: lineRate, earned_amount: e,
     });
   }
 
