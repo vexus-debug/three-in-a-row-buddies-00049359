@@ -618,9 +618,10 @@
   }
 }
 
-.eye-theme { font-family: "DM Sans", system-ui, sans-serif; }
+.eye-theme { font-family: "Manrope", system-ui, sans-serif; }
 .eye-theme h1, .eye-theme h2, .eye-theme h3, .eye-theme .font-display {
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-family: "Sora", system-ui, sans-serif;
+  letter-spacing: -0.02em;
 }
 .eye-theme .eye-panel-light {
   background-color: hsl(var(--site-surface-1));
@@ -657,34 +658,51 @@
 }
 
 /* ── Typography ── */
+/* Marketing type system: Sora (display) + Manrope (body & data). */
+.site-theme,
+.site-theme :where(p, li, span, a, button, input, textarea, label, dd, dt, figcaption) {
+  font-family: "Manrope", system-ui, sans-serif;
+}
 .site-theme h1,
 .site-theme h2,
-.site-theme h3 {
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+.site-theme h3,
+.site-theme h4,
+.site-theme .font-display {
+  font-family: "Sora", system-ui, sans-serif;
   font-weight: 600;
-  letter-spacing: -0.02em;
   text-wrap: balance;
 }
-.site-theme h1 { line-height: 1.06; }
+.site-theme h1,
+.site-theme h2 { letter-spacing: -0.025em; }
+.site-theme h3,
+.site-theme h4 { letter-spacing: -0.01em; }
+.site-theme h1 { line-height: 1.14; }
+@media (min-width: 768px) {
+  .site-theme h1 { line-height: 1.08; }
+}
+.site-theme h2 { line-height: 1.18; }
 .site-theme p,
 .site-theme li {
-  font-family: "DM Sans", system-ui, sans-serif;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
   text-wrap: pretty;
 }
 .site-theme .site-prose p,
 .site-theme .site-prose li {
   max-width: 70ch;
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 .site-theme .site-eyebrow {
-  font-family: "DM Sans", system-ui, sans-serif;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-family: "Manrope", system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: hsl(var(--text-muted));
+}
+/* Legibility floor: no marketing text below 12px. */
+.site-theme :where(.text-\[10px\], .text-\[11px\]) {
+  font-size: 0.75rem;
 }
 .site-theme .tabular-nums,
 .site-theme .site-figure {
