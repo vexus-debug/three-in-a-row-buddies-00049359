@@ -13,6 +13,17 @@ export interface UpdateEntry {
 
 export const updates: UpdateEntry[] = [
   {
+    version: "v2.21.1",
+    date: "October 30, 2026",
+    title: "Tiered commission engine and older statement clarity",
+    kind: "improvement",
+    items: [
+      { kind: "feature", text: "Pay calculations now support graduated commission brackets on net production (e.g. 30% to 10k, 35% to 20k, 40% above)." },
+      { kind: "improvement", text: "Older pay statements show \"Not recorded\" for split share instead of implying 100% solo work." },
+      { kind: "fix", text: "Lab client statements no longer crash when invoice data hasn't loaded yet." },
+    ],
+  },
+  {
     version: "v2.21.0",
     date: "October 30, 2026",
     title: "Associate workflow: chairs, splits, locked pay periods",
