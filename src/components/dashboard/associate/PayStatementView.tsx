@@ -60,7 +60,7 @@ export function StatementLines({ lines }: { lines: (Pick<PayLine, "item_type" | 
                 <Badge variant="outline" className="mr-2 text-[10px]">{TYPE_LABEL[l.item_type] || l.item_type}</Badge>
                 {l.description}
               </td>
-              <td className="px-3 py-2 text-right text-muted-foreground">{l.item_type === "procedure" ? `${l.attribution ?? 100}%` : "—"}</td>
+              <td className="px-3 py-2 text-right text-muted-foreground">{l.item_type !== "procedure" ? "—" : l.attribution == null ? <span title="Recorded before split tracking — share not captured">Not recorded</span> : `${l.attribution}%`}</td>
               <td className="px-3 py-2 text-right">{naira(l.gross_amount)}</td>
               <td className="px-3 py-2 text-right hidden sm:table-cell">{l.item_type === "procedure" ? naira(l.net_amount) : "—"}</td>
               <td className={`px-3 py-2 text-right font-semibold ${Number(l.earned_amount) < 0 ? "text-destructive" : ""}`}>{naira(l.earned_amount)}</td>
@@ -95,7 +95,7 @@ const esc = (v: unknown) => String(v ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&
 
 /** Opens a printable pay stub; the browser's print dialog also saves it as PDF. */
 export function printPayStub(opts: { title: string; staffName: string; lines: any[]; total: number; paid?: number }) {
-  const rows = opts.lines.map((l) => `<tr><td>${esc(l.item_date || "—")}</td><td>${esc(TYPE_LABEL[l.item_type] || l.item_type)}: ${esc(l.description)}</td><td class="r">${l.item_type === "procedure" ? `${esc(l.attribution ?? 100)}%` : "—"}</td><td class="r">${esc(naira(l.gross_amount))}</td><td class="r">${esc(naira(l.earned_amount))}</td></tr>`).join("");
+  const rows = opts.lines.map((l) => `<tr><td>${esc(l.item_date || "—")}</td><td>${esc(TYPE_LABEL[l.item_type] || l.item_type)}: ${esc(l.description)}</td><td class="r">${l.item_type !== "procedure" ? "—" : l.attribution == null ? "Not recorded" : `${esc(l.attribution)}%`}</td><td class="r">${esc(naira(l.gross_amount))}</td><td class="r">${esc(naira(l.earned_amount))}</td></tr>`).join("");
   const html = `<!doctype html><html><head><title>${esc(opts.title)}</title><style>body{font-family:system-ui,sans-serif;padding:32px;color:#111}h1{font-size:18px;margin:0}p{margin:4px 0 16px;color:#555;font-size:13px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left}.r{text-align:right}tfoot td{font-weight:700}</style></head><body><h1>Pay statement — ${esc(opts.staffName)}</h1><p>${esc(opts.title)}</p><table><thead><tr><th>Date</th><th>Item</th><th class="r">Split</th><th class="r">Fee</th><th class="r">Earned</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td colspan="4">Total payable</td><td class="r">${esc(naira(opts.total))}</td></tr>${opts.paid != null ? `<tr><td colspan="4">Paid</td><td class="r">${esc(naira(opts.paid))}</td></tr>` : ""}</tfoot></table><script>window.onload=()=>window.print()</script></body></html>`;
   const w = window.open("", "_blank");
   if (!w) return;

@@ -92,6 +92,8 @@ export function calculatePayStatement(
   labs: LabCharge[],
 ): PayStatement {
   const rate = contract.commission_rate;
+  const tiers = contract.commission_tiers?.length ? contract.commission_tiers : null;
+  let cumNet = 0;
   const lines: PayLine[] = [];
   let gross = 0, net = 0, earned = 0, labDed = 0;
   const days = new Set<string>();
@@ -106,13 +108,18 @@ export function calculatePayStatement(
       n = n * ratio;
     }
     n = r2(n);
-    const e = r2((n * rate) / 100);
+    // Tiers are marginal on running net production (after discounts, before lab fees).
+    const e = tiers
+      ? r2(tieredCommission(cumNet + n, tiers, rate) - tieredCommission(cumNet, tiers, rate))
+      : r2((n * rate) / 100);
+    cumNet += n;
+    const lineRate = tiers ? (n > 0 ? r2((e / n) * 100) : 0) : rate;
     gross += g; net += n; earned += e;
     days.add(l.invoice_date);
     lines.push({
       item_type: "procedure", source_id: l.id, patient_id: l.patient_id, item_date: l.invoice_date,
       description: att < 100 ? `${l.description} (${att}% split)` : l.description, attribution: att, gross_amount: r2(g), deduction_amount: r2(g - n), net_amount: n,
-      commission_rate: rate, earned_amount: e,
+      commission_rate: lineRate, earned_amount: e,
     });
   }
 
